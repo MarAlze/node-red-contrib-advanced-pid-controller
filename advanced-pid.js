@@ -34,6 +34,8 @@ module.exports = function(RED) {
             node.output_min = Number(config.output_min);
             node.output_max = Number(config.output_max);
             node.deadband = Number(config.deadband);
+            node.useCodesysI = config.useCodesysI === true;
+            node.i_clamp = Number(config.i_clamp) || 0;
         } catch (error) {
             node.error("Error parsing configuration parameters: " + error.message);
             return;
@@ -46,7 +48,7 @@ module.exports = function(RED) {
         node.autoEnable = true; // Auto mode enable flag, defaults to true.
 
         // Validate that all necessary parameters are valid numbers.
-        if (isNaN(node.k_p) || isNaN(node.k_i) || isNaN(node.k_d) || isNaN(node.dt) || isNaN(node.output_min) || isNaN(node.output_max) || isNaN(node.deadband)) {
+        if (isNaN(node.k_p) || isNaN(node.k_i) || isNaN(node.k_d) || isNaN(node.dt) || isNaN(node.output_min) || isNaN(node.output_max) || isNaN(node.deadband) || isNaN(node.i_clamp)) {
             node.error("Invalid parameters: Ensure all configuration values are numbers.");
             return;
         }
@@ -57,7 +59,7 @@ module.exports = function(RED) {
 
         // Initialize the PID controller with the provided settings.
         try {
-            controller = new PIDController(node.k_p, node.k_i, node.k_d, node.dt, node.output_min, node.output_max, node.deadband);
+            controller = new PIDController(node.k_p, node.k_i, node.k_d, node.dt, node.output_min, node.output_max, node.deadband, node.useCodesysI, node.i_clamp);
         } catch (error) {
             node.error("Error creating PID Controller: " + error.message);
             return;
@@ -97,6 +99,8 @@ module.exports = function(RED) {
                     I: controller.i,
                     D: controller.d,
                     deadband: controller.deadband,
+                    useCodesysI: controller.useCodesysI,
+                    iClamp: controller.iClamp,
                     Output: analogValue
                 }
             };
@@ -139,9 +143,23 @@ module.exports = function(RED) {
                     }
                 }
                 
-                // NEW: Update the auto enable flag.
+                // Update the auto enable flag.
                 if (msg.topic === 'autoEnable') {
                     node.autoEnable = (msg.payload === true);
+                }
+
+                // Update the useCodesysI flag dynamically.
+                if (msg.topic === 'useCodesysI') {
+                    node.useCodesysI = (msg.payload === true);
+                    controller.useCodesysI = node.useCodesysI;
+                }
+
+                // Update the integral clamp limit dynamically.
+                if (msg.topic === 'iClamp' || msg.topic === 'i_clamp') {
+                    if (typeof msg.payload === 'number' && msg.payload >= 0) {
+                        node.i_clamp = msg.payload;
+                        controller.iClamp = node.i_clamp;
+                    }
                 }
 
                 // Set the operational mode based on an integer input.

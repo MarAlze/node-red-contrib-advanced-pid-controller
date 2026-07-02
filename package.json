@@ -1,12 +1,13 @@
 {
   "name": "node-red-contrib-advanced-pid-controller",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Node-RED node for implementing an advanced PID controller",
   "main": "advanced-pid.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "node-red": {
+    "version": ">=3.0.0",
     "nodes": {
       "advanced-pid-controller": "advanced-pid.js",
       "pid-setpoint": "pid-sv.js",
@@ -23,11 +24,11 @@
     "node-red": ">=3.0.0"
   },
   "dependencies": {
-    "advanced-pid-controller": "1.0.1"
+    "advanced-pid-controller": "1.0.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MarAlze/node-red-contrib-advanced-pid-controller.git"
+    "url": "git+https://github.com/MarAlze/node-red-contrib-advanced-pid-controller.git"
   },
   "keywords": [
     "node-red",

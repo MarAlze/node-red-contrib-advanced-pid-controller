@@ -10,7 +10,9 @@
             dt: { value: 1, required: true, validate: RED.validators.number() },
             output_min: { value: 0, required: true, validate: RED.validators.number() },
             output_max: { value: 100, required: true, validate: RED.validators.number() },
-            deadband: { value: 0.5, required: true, validate: RED.validators.number() }
+            deadband: { value: 0.5, required: true, validate: RED.validators.number() },
+            useCodesysI: { value: false },
+            i_clamp: { value: 0, required: true, validate: RED.validators.number() }
         },
         inputs: 1,
         outputs: 3,
@@ -61,6 +63,15 @@
         <label for="node-input-deadband">Deadband</label>
         <input type="number" id="node-input-deadband" step="0.1" placeholder="e.g., 0.5">
     </div>
+    <div class="form-row">
+        <label for="node-input-useCodesysI"><i class="fa fa-cogs"></i> Codesys I-Term</label>
+        <input type="checkbox" id="node-input-useCodesysI" style="display:inline-block; width:auto; vertical-align:top;">
+        <span style="font-size:0.9em; margin-left:5px;">Interpret Ki as TN and use trapezoidal integration</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-i_clamp">Integral Clamp</label>
+        <input type="number" id="node-input-i_clamp" step="0.1" placeholder="0 = disabled">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="advanced-pid-controller">
@@ -74,6 +85,8 @@
         <li><b>Time Interval (dt)</b>: The controller's update interval in seconds.</li>
         <li><b>Output Min/Max</b>: The minimum and maximum limits for the controller's output (anti-windup).</li>
         <li><b>Deadband</b>: A range around the setpoint where the controller will pause its calculations to prevent oscillation.</li>
+        <li><b>Codesys I-Term</b>: If checked, Ki acts as TN in seconds and uses trapezoidal integration.</li>
+        <li><b>Integral Clamp</b>: Maximum absolute limit for the integral term. Set to 0 to disable.</li>
     </ul>
 
     <h3>Inputs</h3>
@@ -95,6 +108,10 @@
         <dd>The desired <b>S</b>etpoint <b>V</b>alue for the controller.</dd>
         <dt>manualValue <span class="property-type">number</span></dt>
         <dd>The value to output when the controller is in <b>Manual</b> mode.</dd>
+        <dt>useCodesysI <span class="property-type">boolean</span></dt>
+        <dd>Dynamically toggles whether the Codesys-compatible integral calculation is active.</dd>
+        <dt>iClamp <span class="property-type">number</span></dt>
+        <dd>Dynamically updates the integral clamping limit (use 0 to disable).</dd>
     </dl>
 
     <h3>Outputs</h3>
